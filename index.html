@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KSMC Inquiry Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+            letter-spacing: -0.01em;
+            padding: 50px 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 650px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid #e2e8f0;
+        }
+        h2 {
+            margin-top: 0;
+            font-size: 2.15em;
+            font-weight: 700;
+            color: #0f172a;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 18px;
+            letter-spacing: -0.03em;
+        }
+        .inquiry-id {
+            font-size: 0.85em;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 30px;
+            background: #f1f5f9;
+            padding: 8px 14px;
+            border-radius: 6px;
+            display: inline-block;
+            letter-spacing: 0.02em;
+        }
+        .form-group {
+            margin-bottom: 24px;
+        }
+        label {
+            display: block;
+            font-size: 0.92em;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #334155;
+        }
+        .required {
+            color: #ef4444;
+            font-weight: 700;
+            margin-left: 3px;
+            font-size: 1.1em;
+        }
+        .sub-label {
+            font-size: 0.82em;
+            color: #64748b;
+            display: block;
+            margin-bottom: 8px;
+            margin-top: -2px;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 0.95em;
+            color: #1e293b;
+            background-color: #fff;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+        }
+
+        .section-header {
+            margin: 45px 0 25px 0;
+            display: flex;
+            align-items: center;
+        }
+        .section-title {
+            font-size: 1.25em;
+            color: #0f172a;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            white-space: nowrap;
+            margin: 0;
+        }
+        .section-line {
+            flex-grow: 1;
+            height: 1px;
+            background-color: #e2e8f0;
+            margin-left: 15px;
+        }
+
+        button[type="submit"] {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 0.95em;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.15s ease;
+            letter-spacing: 0.01em;
+            margin-top: 10px;
+        }
+        button[type="submit"]:hover {
+            background-color: #1d4ed8;
+        }
+
+        #response {
+            display: none;
+            margin-top: 20px;
+            padding: 14px;
+            border-radius: 6px;
+            font-size: 0.92em;
+            font-weight: 500;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>KSMC Inquiry Platform</h2>
+    
+    <div class="inquiry-id" id="inquiryIdDisplay">Initializing session...</div>
+
+    <form id="webhookForm" action="#" method="POST">
+        
+        <input type="hidden" id="inquiryDateBase" name="inquiryDateBase">
+        <input type="hidden" id="inquiry_id" name="inquiry_id">
+
+        <div class="form-group">
+            <label for="market">Market<span class="required">*</span></label>
+            <input type="text" id="market" name="market" list="market_list" placeholder="e.g., Automotive, IoT, Industrial" required>
+            <datalist id="market_list">
+                <option value="Automotive">
+                <option value="Industrial & Automation">
+                <option value="Consumer Electronics">
+                <option value="IoT (Internet of Things)">
+                <option value="Computing & Data Centers">
+                <option value="Communications & 5G">
+                <option value="Aerospace & Defense">
+                <option value="Medical Devices">
+            </datalist>
+        </div>
+
+        <div class="form-group">
+            <label for="customer_name">Customer Name<span class="required">*</span></label>
+            <input type="text" id="customer_name" name="customer_name" placeholder="Enter company or client name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="customer_email">Customer Email Address<span class="required">*</span></label>
+            <input type="email" id="customer_email" name="customer_email" placeholder="name@company.com" required>
+        </div>
+
+        <div class="form-group">
+            <label for="customer_phone">Customer Phone Number<span class="required">*</span></label>
+            <input type="text" id="customer_phone" name="customer_phone" placeholder="e.g., +1 123-456-7890 or 010-1234-5678" required>
+            <span class="sub-label">Accepts international codes, spaces, dashes, and numbers.</span>
+        </div>
+
+        <div class="form-group">
+            <label for="chip_id">Chip ID or Competitor Part Number<span class="required">*</span></label>
+            <input type="text" id="chip_id" name="chip_id" list="chip_list" placeholder="Select a part number or type custom entry..." required>
+            <datalist id="chip_list">
+                <option value="KSMC-MCU0317">
+                <option value="KSMC-LGC0096">
+                <option value="KSMC-LGC0320">
+                <option value="KSMC-ANA0310">
+                <option value="KSMC-PWR0106">
+                <option value="KSMC-PWR0174">
+                <option value="KSMC-RFF0181">
+                <option value="KSMC-LGC0200">
+                <option value="KSMC-PWR0201">
+                <option value="KSMC-MXS0155">
+                <option value="KSMC-ANA0386">
+                <option value="KSMC-MXS0292">
+                <option value="KSMC-MXS0421">
+                <option value="KSMC-SNS0012">
+                <option value="KSMC-MEM0262">
+                <option value="KSMC-PWR0034">
+                <option value="KSMC-MCU0046">
+                <option value="KSMC-SNS0194">
+                <option value="KSMC-MCU0412">
+                <option value="KSMC-PWR0015">
+                <option value="KSMC-ANA0401">
+                <option value="KSMC-LGC0423">
+                <option value="KSMC-MEM0270">
+                <option value="KSMC-MEM0299">
+                <option value="KSMC-SNS0048">
+                <option value="KSMC-RFF0160">
+                <option value="KSMC-MCU0072">
+                <option value="KSMC-ANA0415">
+                <option value="KSMC-RFF0408">
+                <option value="KSMC-ANA0389">
+                <option value="KSMC-MEM0363">
+                <option value="KSMC-MCU0286">
+                <option value="KSMC-MCU0191">
+                <option value="KSMC-MCU0284">
+                <option value="KSMC-MEM0153">
+                <option value="KSMC-MCU0055">
+                <option value="KSMC-SNS0144">
+                <option value="KSMC-PWR0228">
+                <option value="KSMC-MCU0176">
+                <option value="KSMC-PWR0114">
+                <option value="KSMC-ANA0185">
+                <option value="KSMC-RFF0341">
+                <option value="KSMC-MCU0435">
+                <option value="KSMC-ANA0157">
+                <option value="KSMC-SNS0068">
+                <option value="KSMC-SNS0256">
+                <option value="KSMC-MXS0125">
+                <option value="KSMC-MEM0443">
+                <option value="KSMC-ASK0431">
+                <option value="KSMC-PWR0377">
+                <option value="KSMC-MXS0275">
+                <option value="KSMC-ANA0148">
+                <option value="KSMC-RFF0218">
+                <option value="KSMC-PWR0040">
+                <option value="KSMC-RFF0430">
+                <option value="KSMC-MCU0051">
+                <option value="KSMC-SNS0187">
+                <option value="KSMC-RFF0388">
+                <option value="KSMC-ANA0091">
+                <option value="KSMC-ANA0438">
+                <option value="KSMC-PWR0213">
+                <option value="KSMC-PWR0259">
+                <option value="KSMC-MCU0076">
+                <option value="KSMC-LGC0442">
+                <option value="KSMC-ANA0322">
+                <option value="KSMC-MXS0307">
+                <option value="KSMC-PWR0204">
+                <option value="KSMC-LGC0100">
+                <option value="KSMC-MEM0235">
+                <option value="KSMC-MCU0331">
+                <option value="KSMC-PWR0016">
+                <option value="KSMC-MXS0356">
+                <option value="KSMC-ANA0283">
+                <option value="KSMC-MCU0161">
+                <option value="KSMC-LGC0220">
+                <option value="KSMC-PWR0274">
+                <option value="KSMC-PWR0406">
+                <option value="KSMC-PWR0276">
+                <option value="KSMC-MEM0358">
+                <option value="KSMC-PWR0156">
+                <option value="KSMC-ANA0117">
+                <option value="KSMC-PWR0003">
+                <option value="KSMC-ANA0380">
+                <option value="KSMC-MCU0383">
+                <option value="KSMC-SNS0238">
+                <option value="KSMC-RFF0119">
+                <option value="KSMC-MXS0326">
+                <option value="KSMC-ANA0264">
+                <option value="KSMC-ASK0007">
+                <option value="KSMC-SNS0102">
+                <option value="KSMC-ANA0285">
+                <option value="KSMC-MXS0188">
+                <option value="KSMC-SNS0437">
+                <option value="KSMC-ANA0052">
+                <option value="KSMC-MCU0130">
+                <option value="KSMC-MCU0118">
+                <option value="KSMC-ANA0301">
+                <option value="KSMC-MCU0348">
+                <option value="KSMC-LGC0288">
+                <option value="KSMC-MCU0086">
+                <option value="KSMC-MEM0152">
+                <option value="KSMC-SNS0021">
+                <option value="KSMC-ANA0166">
+                <option value="KSMC-SNS0212">
+                <option value="KSMC-RFF0339">
+                <option value="KSMC-ASK0158">
+                <option value="KSMC-ANA0424">
+                <option value="KSMC-MCU0447">
+                <option value="KSMC-PWR0449">
+                <option value="KSMC-SNS0282">
+                <option value="KSMC-MEM0056">
+                <option value="KSMC-MEM0304">
+                <option value="KSMC-RFF0108">
+                <option value="KSMC-MCU0154">
+                <option value="KSMC-PWR0122">
+                <option value="KSMC-MXS0272">
+                <option value="KSMC-MCU0265">
+                <option value="KSMC-ANA0303">
+                <option value="KSMC-LGC0278">
+                <option value="KSMC-MCU0042">
+                <option value="KSMC-MCU0099">
+                <option value="KSMC-SNS0004">
+                <option value="KSMC-MEM0258">
+                <option value="KSMC-ANA0115">
+                <option value="KSMC-MEM0444">
+                <option value="KSMC-MEM0095">
+                <option value="KSMC-SNS0202">
+                <option value="KSMC-PWR0097">
+                <option value="KSMC-PWR0092">
+                <option value="KSMC-ANA0366">
+                <option value="KSMC-RFF0419">
+                <option value="KSMC-PWR0418">
+                <option value="KSMC-MCU0109">
+                <option value="KSMC-PWR0338">
+                <option value="KSMC-RFF0189">
+                <option value="KSMC-ASK0253">
+                <option value="KSMC-ANA0164">
+                <option value="KSMC-LGC0422">
+                <option value="KSMC-MXS0124">
+                <option value="KSMC-ANA0064">
+                <option value="KSMC-LGC0392">
+                <option value="KSMC-ANA0355">
+                <option value="KSMC-MCU0432">
+                <option value="KSMC-ASK0374">
+                <option value="KSMC-MEM0060">
+                <option value="KSMC-SNS0306">
+                <option value="KSMC-ASK0333">
+                <option value="KSMC-ANA0255">
+                <option value="KSMC-LGC0066">
+                <option value="KSMC-RFF0290">
+                <option value="KSMC-RFF0330">
+                <option value="KSMC-MXS0360">
+                <option value="KSMC-MXS0371">
+                <option value="KSMC-ASK0300">
+                <option value="KSMC-ANA0038">
+                <option value="KSMC-ANA0246">
+                <option value="KSMC-MEM0193">
+                <option value="KSMC-RFF0378">
+                <option value="KSMC-PWR0252">
+                <option value="KSMC-MEM0222">
+                <option value="KSMC-ASK0065">
+                <option value="KSMC-MXS0093">
+                <option value="KSMC-MEM0344">
+                <option value="KSMC-SNS0186">
+                <option value="KSMC-SNS0329">
+                <option value="KSMC-ANA0226">
+                <option value="KSMC-MEM0017">
+                <option value="KSMC-MCU0107">
+                <option value="KSMC-MEM0002">
+                <option value="KSMC-PWR0022">
+                <option value="KSMC-MEM0067">
+                <option value="KSMC-MXS0023">
+                <option value="KSMC-MEM0365">
+                <option value="KSMC-MCU0370">
+                <option value="KSMC-MCU0041">
+                <option value="KSMC-MEM0314">
+                <option value="KSMC-MXS0135">
+                <option value="KSMC-MCU0033">
+                <option value="KSMC-MXS0312">
+                <option value="KSMC-PWR0080">
+                <option value="KSMC-PWR0240">
+                <option value="KSMC-MEM0221">
+                <option value="KSMC-ANA0190">
+                <option value="KSMC-LGC0024">
+                <option value="KSMC-PWR0425">
+                <option value="KSMC-MCU0019">
+                <option value="KSMC-SNS0182">
+                <option value="KSMC-MXS0367">
+                <option value="KSMC-PWR0210">
+                <option value="KSMC-ANA0261">
+                <option value="KSMC-PWR0075">
+                <option value="KSMC-MXS0247">
+                <option value="KSMC-MEM0198">
+                <option value="KSMC-LGC0420">
+                <option value="KSMC-ANA0177">
+                <option value="KSMC-MCU0405">
+                <option value="KSMC-MEM0206">
+                <option value="KSMC-MEM0335">
+                <option value="KSMC-ANA0327">
+                <option value="KSMC-ANA0087">
+                <option value="KSMC-ANA0063">
+                <option value="KSMC-MCU0054">
+                <option value="KSMC-MEM0001">
+                <option value="KSMC-SNS0183">
+                <option value="KSMC-PWR0359">
+                <option value="KSMC-MEM0131">
+                <option value="KSMC-MEM0049">
+                <option value="KSMC-ANA0361">
+                <option value="KSMC-MXS0010">
+                <option value="KSMC-ASK0233">
+                <option value="KSMC-SNS0101">
+                <option value="KSMC-ANA0248">
+                <option value="KSMC-LGC0089">
+                <option value="KSMC-MXS0309">
+                <option value="KSMC-MCU0428">
+                <option value="KSMC-MCU0398">
+                <option value="KSMC-RFF0297">
+                <option value="KSMC-LGC0162">
+                <option value="KSMC-MEM0263">
+                <option value="KSMC-SNS0409">
+                <option value="KSMC-MCU0141">
+                <option value="KSMC-ASK0434">
+                <option value="KSMC-SNS0035">
+                <option value="KSMC-ASK0139">
+                <option value="KSMC-MCU0178">
+                <option value="KSMC-ANA0242">
+                <option value="KSMC-SNS0053">
+                <option value="KSMC-ANA0170">
+                <option value="KSMC-LGC0113">
+                <option value="KSMC-MEM0232">
+                <option value="KSMC-MEM0384">
+                <option value="KSMC-ANA0354">
+                <option value="KSMC-MEM0057">
+                <option value="KSMC-MEM0260">
+                <option value="KSMC-SNS0376">
+                <option value="KSMC-MEM0230">
+                <option value="KSMC-RFF0399">
+                <option value="KSMC-ANA0223">
+                <option value="KSMC-MCU0173">
+                <option value="KSMC-ASK0129">
+                <option value="KSMC-MXS0111">
+                <option value="KSMC-PWR0254">
+                <option value="KSMC-LGC0239">
+                <option value="KSMC-LGC0128">
+                <option value="KSMC-SNS0225">
+                <option value="KSMC-ANA0302">
+                <option value="KSMC-PWR0079">
+                <option value="KSMC-MCU0008">
+                <option value="KSMC-MCU0436">
+                <option value="KSMC-MXS0391">
+                <option value="KSMC-RFF0138">
+                <option value="KSMC-LGC0150">
+                <option value="KSMC-PWR0400">
+                <option value="KSMC-MEM0005">
+                <option value="KSMC-MCU0143">
+                <option value="KSMC-MCU0308">
+                <option value="KSMC-ANA0045">
+                <option value="KSMC-MEM0267">
+                <option value="KSMC-RFF0245">
+                <option value="KSMC-MEM0393">
+                <option value="KSMC-MCU0020">
+                <option value="KSMC-PWR0208">
+                <option value="KSMC-LGC0013">
+                <option value="KSMC-MXS0379">
+                <option value="KSMC-ANA0446">
+                <option value="KSMC-MCU0249">
+                <option value="KSMC-MCU0390">
+                <option value="KSMC-ANA0289">
+                <option value="KSMC-MCU0250">
+                <option value="KSMC-ANA0036">
+                <option value="KSMC-MEM0387">
+                <option value="KSMC-LGC0257">
+                <option value="KSMC-ASK0077">
+                <option value="KSMC-PWR0199">
+                <option value="KSMC-MCU0287">
+                <option value="KSMC-MEM0294">
+                <option value="KSMC-MCU0009">
+                <option value="KSMC-PWR0407">
+                <option value="KSMC-ANA0280">
+                <option value="KSMC-PWR0372">
+                <option value="KSMC-MCU0397">
+                <option value="KSMC-PWR0027">
+                <option value="KSMC-LGC0368">
+                <option value="KSMC-MXS0364">
+                <option value="KSMC-MXS0351">
+                <option value="KSMC-SNS0136">
+                <option value="KSMC-ANA0396">
+                <option value="KSMC-ASK0031">
+                <option value="KSMC-MEM0172">
+                <option value="KSMC-MCU0103">
+                <option value="KSMC-RFF0316">
+                <option value="KSMC-ANA0169">
+                <option value="KSMC-ANA0120">
+                <option value="KSMC-ASK0197">
+                <option value="KSMC-SNS0147">
+                <option value="KSMC-LGC0429">
+                <option value="KSMC-MCU0426">
+                <option value="KSMC-MEM0047">
+                <option value="KSMC-SNS0142">
+                <option value="KSMC-PWR0006">
+                <option value="KSMC-MCU0043">
+                <option value="KSMC-SNS0340">
+                <option value="KSMC-PWR0074">
+                <option value="KSMC-ANA0132">
+                <option value="KSMC-SNS0353">
+                <option value="KSMC-SNS0224">
+                <option value="KSMC-MEM0313">
+                <option value="KSMC-PWR0070">
+                <option value="KSMC-SNS0050">
+                <option value="KSMC-SNS0296">
+                <option value="KSMC-MXS0445">
+                <option value="KSMC-MCU0175">
+                <option value="KSMC-ANA0098">
+                <option value="KSMC-PWR0234">
+                <option value="KSMC-SNS0440">
+                <option value="KSMC-PWR0269">
+                <option value="KSMC-MCU0205">
+                <option value="KSMC-MEM0373">
+                <option value="KSMC-PWR0411">
+                <option value="KSMC-PWR0336">
+                <option value="KSMC-ANA0032">
+                <option value="KSMC-LGC0357">
+                <option value="KSMC-ANA0281">
+                <option value="KSMC-MEM0082">
+                <option value="KSMC-MCU0192">
+                <option value="KSMC-LGC0165">
+                <option value="KSMC-LGC0279">
+                <option value="KSMC-LGC0271">
+                <option value="KSMC-PWR0026">
+                <option value="KSMC-MEM0362">
+                <option value="KSMC-ANA0121">
+                <option value="KSMC-MEM0134">
+                <option value="KSMC-ANA0349">
+                <option value="KSMC-MCU0410">
+                <option value="KSMC-MCU0311">
+                <option value="KSMC-MCU0163">
+                <option value="KSMC-ANA0058">
+                <option value="KSMC-PWR0229">
+                <option value="KSMC-MCU0402">
+                <option value="KSMC-SNS0413">
+                <option value="KSMC-LGC0403">
+                <option value="KSMC-PWR0180">
+                <option value="KSMC-SNS0375">
+                <option value="KSMC-MCU0332">
+                <option value="KSMC-MEM0105">
+                <option value="KSMC-LGC0295">
+                <option value="KSMC-LGC0352">
+                <option value="KSMC-PWR0305">
+                <option value="KSMC-MEM0236">
+                <option value="KSMC-MCU0209">
+                <option value="KSMC-RFF0381">
+                <option value="KSMC-MEM0394">
+                <option value="KSMC-PWR0085">
+                <option value="KSMC-MEM0268">
+                <option value="KSMC-PWR0244">
+                <option value="KSMC-ASK0084">
+                <option value="KSMC-SNS0414">
+                <option value="KSMC-PWR0196">
+                <option value="KSMC-MEM0179">
+                <option value="KSMC-MCU0323">
+                <option value="KSMC-ANA0140">
+                <option value="KSMC-ANA0337">
+                <option value="KSMC-LGC0293">
+                <option value="KSMC-RFF0321">
+                <option value="KSMC-MCU0369">
+                <option value="KSMC-PWR0159">
+                <option value="KSMC-PWR0061">
+                <option value="KSMC-ANA0059">
+                <option value="KSMC-PWR0227">
+                <option value="KSMC-MCU0116">
+                <option value="KSMC-SNS0217">
+                <option value="KSMC-ANA0343">
+                <option value="KSMC-LGC0298">
+                <option value="KSMC-MCU0145">
+                <option value="KSMC-SNS0382">
+                <option value="KSMC-RFF0318">
+                <option value="KSMC-MCU0346">
+                <option value="KSMC-MEM0231">
+                <option value="KSMC-PWR0094">
+                <option value="KSMC-MEM0030">
+                <option value="KSMC-SNS0324">
+                <option value="KSMC-MCU0104">
+                <option value="KSMC-ASK0110">
+                <option value="KSMC-PWR0433">
+                <option value="KSMC-MCU0325">
+                <option value="KSMC-ANA0203">
+                <option value="KSMC-MCU0439">
+                <option value="KSMC-ANA0018">
+                <option value="KSMC-ANA0417">
+                <option value="KSMC-ASK0037">
+                <option value="KSMC-MCU0149">
+                <option value="KSMC-MCU0266">
+                <option value="KSMC-MEM0062">
+                <option value="KSMC-MXS0071">
+                <option value="KSMC-MCU0219">
+                <option value="KSMC-ANA0395">
+                <option value="KSMC-MCU0448">
+                <option value="KSMC-MCU0416">
+                <option value="KSMC-MCU0078">
+                <option value="KSMC-PWR0126">
+                <option value="KSMC-ANA0427">
+                <option value="KSMC-ANA0211">
+                <option value="KSMC-ANA0216">
+                <option value="KSMC-MCU0171">
+                <option value="KSMC-RFF0347">
+                <option value="KSMC-MCU0073">
+                <option value="KSMC-RFF0123">
+                <option value="KSMC-LGC0044">
+                <option value="KSMC-SNS0090">
+                <option value="KSMC-MEM0385">
+                <option value="KSMC-MCU0151">
+                <option value="KSMC-SNS0069">
+                <option value="KSMC-LGC0146">
+                <option value="KSMC-PWR0237">
+                <option value="KSMC-PWR0214">
+                <option value="KSMC-ANA0291">
+                <option value="KSMC-RFF0039">
+                <option value="KSMC-ANA0207">
+                <option value="KSMC-MEM0083">
+                <option value="KSMC-MEM0127">
+                <option value="KSMC-PWR0319">
+                <option value="KSMC-MCU0088">
+                <option value="KSMC-MEM0215">
+                <option value="KSMC-MXS0273">
+                <option value="KSMC-MCU0350">
+                <option value="KSMC-PWR0081">
+                <option value="KSMC-ANA0441">
+                <option value="KSMC-LGC0167">
+                <option value="KSMC-MCU0241">
+                <option value="KSMC-SNS0243">
+                <option value="KSMC-MCU0277">
+                <option value="KSMC-ANA0404">
+                <option value="KSMC-MCU0137">
+                <option value="KSMC-MXS0133">
+                <option value="KSMC-MCU0029">
+                <option value="KSMC-MCU0168">
+                <option value="KSMC-PWR0334">
+                <option value="KSMC-MEM0450">
+                <option value="KSMC-MCU0251">
+                <option value="KSMC-RFF0011">
+                <option value="KSMC-PWR0195">
+                <option value="KSMC-MEM0014">
+                <option value="KSMC-PWR0112">
+                <option value="KSMC-MEM0345">
+                <option value="KSMC-MXS0342">
+                <option value="KSMC-MCU0184">
+                <option value="KSMC-MCU0328">
+                <option value="KSMC-SNS0315">
+                <option value="KSMC-PWR0028">
+                <option value="KSMC-MCU0025">
+            </datalist>
+        </div>
+
+        <div class="form-group">
+            <label for="quantity">Quantity<span class="required">*</span></label>
+            <input type="number" id="quantity" name="quantity" placeholder="e.g., 5000" required>
+        </div>
+
+        <div class="form-group">
+            <label for="destination">Ship To Destination<span class="required">*</span></label>
+            <input type="text" id="destination" name="destination" placeholder="Country / City / Region" required>
+        </div>
+
+        <div class="form-group">
+            <label for="target_price">Target Price</label>
+            <input type="text" id="target_price" name="target_price" placeholder="e.g., $1.50 per unit">
+        </div>
+
+        <div class="section-header">
+            <h3 class="section-title">Requirements (Optional)</h3>
+            <div class="section-line"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="technical_requirement">Technical Requirement</label>
+            <input type="text" id="technical_requirement" name="technical_requirement" placeholder="Specify voltage, package size, speed, etc.">
+        </div>
+
+        <div class="form-group">
+            <label for="quality_compliance">Quality Compliance</label>
+            <input type="text" id="quality_compliance" name="quality_compliance" placeholder="e.g., AEC-Q100, RoHS, ISO9001">
+        </div>
+
+        <div class="form-group">
+            <label for="customer_remarks">Remarks / Detailed Request</label>
+            <span class="sub-label">Please express any specific requirements, context, or custom instructions for Langflow processing.</span>
+            <textarea id="customer_remarks" name="customer_remarks" rows="5" placeholder="Enter explicit requests, project backgrounds, or prompts here..."></textarea>
+        </div>
+
+        <button type="submit">Submit Inquiry</button>
+        
+        <div id="response"></div>
+    </form>
+</div>
+
+<script>
+    function generateInquiryBase() {
+        const today = new Date();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const yyyy = today.getFullYear();
+        
+        const dateStr = `${mm}${dd}${yyyy}`;
+        
+        const uniqueSuffix = Math.floor(1000 + Math.random() * 9000);
+        const fullInquiryId = `INQ-${dateStr}-${uniqueSuffix}`;
+        
+        document.getElementById('inquiryDateBase').value = dateStr;
+        document.getElementById('inquiry_id').value = fullInquiryId; 
+        
+        document.getElementById('inquiryIdDisplay').innerHTML = `Current Inquiry ID: <strong>${fullInquiryId}</strong>`;
+    }
+
+    generateInquiryBase();
+
+    document.getElementById('webhookForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const responseDiv = document.getElementById('response');
+        const submitBtn = this.querySelector('button[type="submit"]');
+
+        //  webhook-test → webhook 으로 변경 (Production URL: 항상 열려있음)
+        const webhookUrl = 'http://115.145.13.38:10018/webhook/6961e620-d339-4d01-ada6-70a0d7b690ec';
+
+        //  n8n 워크플로우가 기대하는 필드명으로 매핑
+        const payload = {
+            "Inquiry ID":             document.getElementById('inquiry_id').value,
+            "Market":                 document.getElementById('market').value,
+            "Customer":               document.getElementById('customer_name').value,
+            "Email":                  document.getElementById('customer_email').value,
+            "Tel":                    document.getElementById('customer_phone').value,
+            "Chip":                   document.getElementById('chip_id').value,
+            "Q'ty":                   document.getElementById('quantity').value,
+            "Ship To":                document.getElementById('destination').value,
+            "Target Price":           document.getElementById('target_price').value,
+            "Technical Requirement":  document.getElementById('technical_requirement').value,
+            "Quality Compliance":     document.getElementById('quality_compliance').value,
+            "Remarks":                document.getElementById('customer_remarks').value,
+        };
+
+        responseDiv.style.display = 'block';
+        responseDiv.style.backgroundColor = '#e1f5fe';
+        responseDiv.style.color = '#0288d1';
+        responseDiv.innerText = 'Submitting inquiry to KSMC backend...';
+        submitBtn.disabled = true;
+
+        try {
+            const response = await fetch(webhookUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                responseDiv.style.backgroundColor = '#e8f5e9';
+                responseDiv.style.color = '#2e7d32';
+                responseDiv.innerText = 'Success! Your inquiry (' + payload["Inquiry ID"] + ') has been submitted.';
+                this.reset();
+                generateInquiryBase();
+            } else {
+                throw new Error('Server error: HTTP ' + response.status);
+            }
+        } catch (error) {
+            responseDiv.style.backgroundColor = '#ffebee';
+            responseDiv.style.color = '#c62828';
+            responseDiv.innerText = '❌ Submission Error: ' + error.message;
+        } finally {
+            submitBtn.disabled = false;
+        }
+    });
+</script>
+
+</body>
+</html>
